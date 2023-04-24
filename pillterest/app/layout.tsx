@@ -1,6 +1,6 @@
 'use client'
 
-import { AuthContextProvider } from '../../backend/context/authContext'
+import { AuthContextProvider } from '../backend/context/authContext'
 import { Providers } from './providers'
 
 export default function RootLayout({
