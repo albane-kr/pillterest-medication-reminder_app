@@ -1,19 +1,32 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
-import { Box, Button, Checkbox, InputGroup, InputRightElement, Skeleton, Container, Heading, VStack, StackDivider, HStack, Input, Stack, Text } from '@chakra-ui/react'
-import { ST } from 'next/dist/shared/lib/utils'
+import { Box, Button, Checkbox, InputGroup, InputRightElement, Skeleton, Container, Heading, VStack, StackDivider, HStack, Input, Stack, Text, useFocusEffect } from '@chakra-ui/react'
+import { useAuthContext } from '@/backend/context/authContext'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { auth } from '@/backend/firebase/firebaseConfig'
 
 export default function Home() {
+  const { user } = useAuthContext()
+  const router = useRouter()
+
+  const logout = () => {
+    auth.signOut()
+  }
+
+  useEffect( () => {
+    if ( user == null ) router.push('/')
+  }, [router, user])
+
   return (
     <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }}>
       <VStack spacing={5} align='stretch'>
       <InputGroup>
         <InputRightElement>
-          <Button colorScheme="blue" >
-            <Link href="../page.tsx">
+          <Button onClick={logout} colorScheme="blue" width={{base: 'md', sm: 'md'}}>
               Sign Out
-            </Link>
           </Button>
         </InputRightElement>
       </InputGroup>
@@ -88,12 +101,3 @@ export default function Home() {
     </Container>
   )
 }
-/*
-<main>
-<h1>Welcome to your Pillterest!</h1>
-<Link href="/about">Go to About Page</Link>
-<Link href="/calendar">Go to Calendar Page</Link>
-<Link href="/cabinet">Go to Cabinet Page</Link>
-<Link href="/newMed">Go to New Med Form Page</Link>
-</main>
-*/

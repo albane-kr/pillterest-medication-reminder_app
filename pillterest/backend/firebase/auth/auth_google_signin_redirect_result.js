@@ -12,7 +12,7 @@ export default async function signInWithRedirectGoogle() {
   if (result) {
     // This is the signed-in user
     const user = result.user;
-    // This gives you a Facebook Access Token.
+    // This gives you a Google Access Token.
     const credential = googleProvider.credentialFromResult(auth, result);
     const token = credential.accessToken;
   }
