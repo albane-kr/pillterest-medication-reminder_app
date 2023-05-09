@@ -1,6 +1,6 @@
 import { db } from "../firebaseConfig";
 import { collection, addDoc, updateDoc, doc, deleteDoc, } from 'firebase/firestore'
-
+import { AuthContext} from '@/backend/context/authContext';
 
 //create new mdeication (has to public to all users)
 const createMed = async ({ medName, drugAdminType, qtyPackage }) => {
@@ -32,22 +32,23 @@ const toggleDrugAdminType = async ({ docId, drugAdministrationType }) => {
 }
 
 //adds new med to the prescription list of medications
-const addMed = async ({ 
+const addMed = async ({
     medName, 
     qtyPerTake, 
     freqPerDay, 
     timeOfTreatment, 
-    //stockLeft 
+    //stockLeft, 
     }) => {
     try {
-        await addDoc(collection(db, "Prescribed_Med"), {
+        const docRef1 = await addDoc(collection(db, "Prescribed_Med"), {
             medicationName: medName,
             quantityPerTake: qtyPerTake,
             frequencyPerDay: freqPerDay,
             timeOfTreatment: timeOfTreatment,
             //stockLeft: stockLeft,
-            createdAt: new Date().getTime(),
+            //uid: AuthContext
         })
+        console.log(docRef1.id)
     } catch (e) {
         console.log(e)
     }

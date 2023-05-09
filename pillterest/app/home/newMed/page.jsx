@@ -16,6 +16,7 @@ export default function NewMed() {
   const [qtyPerTake, setQtyPerTake] = useState("")
   const [freqPerDay, setFreqPerDay] = useState("")
   const [timeOfTreatment, setTimeOfTreatment] = useState("")
+  //const [uId, setUserId] = useState(null)
   //const [stockLeft, setStockLeft] = useState("")
   
   const handleAddMed = async () => {
@@ -36,7 +37,6 @@ export default function NewMed() {
       freqPerDay, 
       timeOfTreatment, 
       //stockLeft,
-      //userId : user.uid 
     }
 
     await addMed(addNewMed)
@@ -45,6 +45,7 @@ export default function NewMed() {
     setFreqPerDay("")
     setTimeOfTreatment("")
     /*setStockLeft("")*/
+    //setUserId(userUId)
     toast({
       title: "Prescribed medication created successfully",
       status: "success"
@@ -82,7 +83,7 @@ export default function NewMed() {
             Add        
           </Button>
           <Button>
-            <Link href="/home/">
+            <Link href="/home">
               Finish
             </Link>
           </Button>
