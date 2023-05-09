@@ -22,7 +22,7 @@ export default function Cabinet() {
       return
     }
 
-    //get data from documents of the collection "Medications" 
+    //get data from documents of the collection "Prescribed_Med" 
     //and push them into an array to be able to map the different documents to display
     const collPrescribedMed = collection(db, "Prescribed_Med")
     const qPrescMed = query(collPrescribedMed)

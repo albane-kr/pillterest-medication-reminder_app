@@ -1,6 +1,7 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from 'firebase/firestore'
+import { getMessaging } from "firebase/messaging/sw";
 
 //app's Firebase configuration
 const firebaseCredentials = ({
@@ -31,6 +32,9 @@ export const initFirebase = () => {
 
 //Initialize Cloud Firestore and get a ref to the service
 export const db = getFirestore(app)
+
+// Retrieve an instance of Firebase Messaging so that it can handle background messages.
+export const messaging = getMessaging(app);
 
 
 
