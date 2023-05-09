@@ -2,7 +2,7 @@ import { FormControl, FormLabel, IconButton, Input, InputGroup, InputProps, Inpu
 import { forwardRef, useRef } from 'react'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
   
-export const ConfirmPasswordField = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+export const ConfirmPasswordField = forwardRef<HTMLInputElement>((props, ref) => {
   const { isOpen, onToggle } = useDisclosure()
   const inputRef = useRef<HTMLInputElement>(null)
   
@@ -15,7 +15,7 @@ export const ConfirmPasswordField = forwardRef<HTMLInputElement, InputProps>((pr
   }
   
   return (
-    <FormControl>
+    <FormControl isRequired>
       <FormLabel htmlFor="password">Confirm Password</FormLabel>
       <InputGroup>
         <InputRightElement>

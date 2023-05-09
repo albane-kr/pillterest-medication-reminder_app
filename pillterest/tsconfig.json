@@ -23,6 +23,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/_app.jsx", "app/signup.txt", "app/layout.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/_app.jsx", "app/signup.txt", "app/layout.jsx", "app/home/cabinet/page.jsx", "app/home/page.jsx", "app/home/page.jsx", "app/home/newMed/page.jsx", "app/home/newMed/page.jsx", "app/home/newMed/createMed/page.jsx", "app/home/calendar/page.jsx", "app/home/calendar/page.jsx", "app/home/cabinet/stock/page.jsx", "app/home/cabinet/stock/page.jsx", "app/login/page.jsx", "app/login/page.jsx", "app/confirmPasswordField.jsx", "app/confirmPasswordField.jsx", "app/logo.jsx", "app/page.jsx", "app/page.jsx", "app/passwordField.jsx", "app/passwordField.jsx", "app/providers.jsx", "app/providers.jsx", "app/theme.jsx", "app/signinemail/page.jsx", "app/signup/page.jsx"],
   "exclude": ["node_modules"]
 }
