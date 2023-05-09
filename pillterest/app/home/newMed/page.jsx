@@ -2,23 +2,52 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Container, Heading, Box, Input, Button, Stack, Select, HStack, useToast} from "@chakra-ui/react";
+import { Container, Heading, Box, Input, Button, Stack, Select, HStack, useToast } from "@chakra-ui/react";
 import { addMed, toggleMedName } from '@/backend/firebase/firestore/db'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/backend/context/authContext';
+import { db } from "@/backend/firebase/firebaseConfig";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 export default function NewMed() {
 
-  const {isLoggedIn, user} = useAuth()
+  const { isLoggedIn, user } = useAuth()
   const toast = useToast();
 
   const [medName, setMedName] = useState("")
+  const [medNameOption, setMedNameOption] = useState([])
   const [qtyPerTake, setQtyPerTake] = useState("")
   const [freqPerDay, setFreqPerDay] = useState("")
   const [timeOfTreatment, setTimeOfTreatment] = useState("")
   //const [uId, setUserId] = useState(null)
   //const [stockLeft, setStockLeft] = useState("")
-  
+
+
+
+  const refreshData = async () => {
+    if (!user) {
+      setMedNameOption([])
+      return
+    }
+    
+    //get data from documents of the collection "Medications" 
+    //and push them into an array to be able to map the different documents to display
+    const collMedications = collection(db, "Medications")
+    const qMed = query(collMedications)
+    const querySnapshot = await getDocs(qMed, where('medicationName', '!==', null));
+    let array = []
+    querySnapshot.forEach((docSnap) => {
+      array.push({ id: docSnap.id, ...docSnap.data() })
+      console.log(docSnap.id, " => ", docSnap.data());
+      setMedNameOption(array)
+    });
+  }
+
+  useEffect(() => {
+    refreshData()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ user])
+
   const handleAddMed = async () => {
 
     if (!isLoggedIn) {
@@ -30,12 +59,12 @@ export default function NewMed() {
       })
       return;
     }
-  
-    const addNewMed = { 
-      medName, 
-      qtyPerTake, 
-      freqPerDay, 
-      timeOfTreatment, 
+
+    const addNewMed = {
+      medName,
+      qtyPerTake,
+      freqPerDay,
+      timeOfTreatment,
       //stockLeft,
     }
 
@@ -67,8 +96,9 @@ export default function NewMed() {
         <Stack direction='column'>
           <HStack spacing={4}>
             <Select placeholder='Name of medication' value={medName} onChange={(e) => setMedName(e.target.value)}>
-              <option value={"name1"}>name1</option>
-              <option value={"name2"}>name2</option>
+            {medNameOption && medNameOption.map((docSnap) =>
+              <option key={docSnap.id} value={docSnap.medicationName}>{docSnap.medicationName}</option>
+            )}
             </Select>
             <Button>
               <Link href="/home/newMed/createMed/">
@@ -78,9 +108,9 @@ export default function NewMed() {
           </HStack>
           <Input placeholder='Quantity per take' value={qtyPerTake} onChange={(e) => setQtyPerTake(e.target.value)} />
           <Input placeholder='Frequency per day' value={freqPerDay} onChange={(e) => setFreqPerDay(e.target.value)} />
-          <Input placeholder='Time of treatment' value={timeOfTreatment} onChange={(e) => setTimeOfTreatment(e.target.value)} />
+          <Input placeholder='Time of treatment dd/mm/yyyy-dd/mm/yyyy' value={timeOfTreatment} onChange={(e) => setTimeOfTreatment(e.target.value)} />
           <Button onClick={() => handleAddMed()} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeOfTreatment.length < 1}>
-            Add        
+            Add
           </Button>
           <Button>
             <Link href="/home">

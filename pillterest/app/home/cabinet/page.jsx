@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { Box, IconButton, Button, SimpleGrid, Card, CardHeader, CardBody, CardFooter, Checkbox, InputGroup, InputRightElement, Skeleton, Container, Heading, VStack, StackDivider, HStack, Input, Stack, Text, useToast, Badge } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { db } from "@/backend/firebase/firebaseConfig";
-import { collection, onSnapshot, query, QuerySnapshot, where, getDocs } from "firebase/firestore";
+import { collection, query, getDocs } from "firebase/firestore";
 import { deleteMed } from '@/backend/firebase/firestore/db'
 import { useAuth } from '@/backend/context/authContext'
-//import { NewMed } from "/home/newMed"
+
 
 export default function Cabinet() {
 
@@ -22,10 +22,12 @@ export default function Cabinet() {
       return
     }
 
-    const collRef = collection(db, "Prescribed_Med")
-    const q = query(collRef)
-    console.log(q)
-    const querySnapshot = await getDocs(q);
+    //get data from documents of the collection "Medications" 
+    //and push them into an array to be able to map the different documents to display
+    const collPrescribedMed = collection(db, "Prescribed_Med")
+    const qPrescMed = query(collPrescribedMed)
+    console.log(qPrescMed)
+    const querySnapshot = await getDocs(qPrescMed);
     let array = []
     querySnapshot.forEach((docSnap) => {
       array.push({id : docSnap.id, ...docSnap.data()})
@@ -40,6 +42,7 @@ export default function Cabinet() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ user])
 
+  
   const handleMedDelete = async (id) => {
     if (confirm("Are you sure you want to delete this medication ?")) {
       deleteMed(id)
@@ -84,7 +87,11 @@ export default function Cabinet() {
             </SimpleGrid>
           </Box>
         </Stack>
-
+        <Button colorScheme='blue'>
+            <Link href="/home">
+              Home
+            </Link>
+          </Button>
       </Stack>
     </Container>
   )
