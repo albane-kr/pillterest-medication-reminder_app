@@ -9,6 +9,7 @@ import { useAuth } from '@/backend/context/authContext';
 import { db } from "@/backend/firebase/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
+
 export default function NewMed() {
 
   const { isLoggedIn, user } = useAuth()
@@ -18,11 +19,8 @@ export default function NewMed() {
   const [medNameOption, setMedNameOption] = useState([])
   const [qtyPerTake, setQtyPerTake] = useState("")
   const [freqPerDay, setFreqPerDay] = useState("")
-  const [timeOfTreatment, setTimeOfTreatment] = useState("")
-  //const [uId, setUserId] = useState(null)
-  //const [stockLeft, setStockLeft] = useState("")
-
-
+  const [timeTreatmentStart, setTimeTreatmentStart] = useState("")
+  const [timeTreatmentEnd, setTimeTreatmentEnd] = useState("")
 
   const refreshData = async () => {
     if (!user) {
@@ -64,17 +62,18 @@ export default function NewMed() {
       medName,
       qtyPerTake,
       freqPerDay,
-      timeOfTreatment,
-      //stockLeft,
+      timeTreatmentStart,
+      timeTreatmentEnd,
+      uid: user.uid
     }
 
     await addMed(addNewMed)
     setMedName("")
     setQtyPerTake("")
     setFreqPerDay("")
-    setTimeOfTreatment("")
-    /*setStockLeft("")*/
-    //setUserId(userUId)
+    setTimeTreatmentStart("")
+    setTimeTreatmentEnd("")
+
     toast({
       title: "Prescribed medication created successfully",
       status: "success"
@@ -109,7 +108,8 @@ export default function NewMed() {
           </HStack>
           <Input borderColor='black' placeholder='Quantity per take' value={qtyPerTake} onChange={(e) => setQtyPerTake(e.target.value)} />
           <Input borderColor='black' placeholder='Frequency per day' value={freqPerDay} onChange={(e) => setFreqPerDay(e.target.value)} />
-          <Input borderColor='black' placeholder='Time of treatment dd/mm/yyyy-dd/mm/yyyy' value={timeOfTreatment} onChange={(e) => setTimeOfTreatment(e.target.value)} />
+          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment starts' value={timeTreatmentStart} onChange={(e) => setTimeTreatmentStart(e.target.value)} />
+          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment ends' value={timeTreatmentEnd} onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
           <Button colorScheme='blue' onClick={() => handleAddMed()} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeOfTreatment.length < 1}>
             Add
           </Button>
