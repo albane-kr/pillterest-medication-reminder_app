@@ -51,29 +51,22 @@ export default function Cabinet() {
   }  
 
   return (
-    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '0', sm: '8' }}>
+    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '0', sm: '8' }} backgroundColor='purple.50'>
       <Stack spacing="8">
         <Stack spacing="8" textAlign="center">
           <Heading size={{ base: 'md', md: 'lg' }}>
             My Medication Cabinet
           </Heading>
         </Stack>
-        <Stack spacing="6" textAlign="center">
-          <Button colorScheme="blue">
-            <Link href="/home/cabinet/stock">
-              Manage my current stock
-            </Link>
-          </Button>
-        </Stack>
         <Stack>
-          <Heading size={{ base: 'sd', md: 'md' }}>
+          <Heading size={{ base: 'sm', md: 'md' }}>
             Your current treatment
           </Heading>
           <Box mt={6}>
-            <SimpleGrid column={{base: 'sm', sm: 'md'}} spacing={8}>
+            <SimpleGrid column={{base: 'xs', sm: 'sm'}} spacing={8}>
               {med && med.map((docSnap) =>
                 <Box key={docSnap.id}>
-                  <Heading>
+                  <Heading size={{ base: 'xs', md: 'sm' }}>
                     {docSnap.medicationName}{" "}
                     <Badge color="blue" onClick={() => handleMedDelete(docSnap.id)}>
                       <DeleteIcon />

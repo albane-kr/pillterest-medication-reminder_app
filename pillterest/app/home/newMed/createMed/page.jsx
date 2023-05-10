@@ -23,7 +23,7 @@ export default function CreateMed() {
   }
 
   return (
-    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '0', sm: '8' }}>
+    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '0', sm: '8' }} backgroundColor='purple.50'>
       <Stack spacing="8">
         <Heading>Describe your new medication</Heading>
       </Stack>
@@ -33,17 +33,18 @@ export default function CreateMed() {
         bg={{ base: 'transparent', sm: 'bg-surface' }}
         boxShadow={{ base: 'none', sm: 'md' }}
         borderRadius={{ base: 'none', sm: 'xl' }}
+        backgroundColor='purple.100'
       >
         <Stack direction='column'>
-          <Input placeholder='Name of the medication' value={medName} onChange={(e) => setMedName(e.target.value)} />
-          <Select placeholder='Drug Administration Type' value={drugAdminType} onChange={(e) => setDrugAdminTime(e.target.value)}>
+          <Input borderColor='black' placeholder='Name of the medication' value={medName} onChange={(e) => setMedName(e.target.value)} />
+          <Select borderColor='black' placeholder='Drug Administration Type' value={drugAdminType} onChange={(e) => setDrugAdminTime(e.target.value)}>
             <option value={"pills"}>pills</option>
           </Select>
-          <Input placeholder='Quantity of pills per package' value={qtyPackage} onChange={(e) => setQtyPackage(e.target.value)} />
-          <Button onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1 || qtyPackage.length < 1}>
+          <Input borderColor='black' placeholder='Quantity of pills per package' value={qtyPackage} onChange={(e) => setQtyPackage(e.target.value)} />
+          <Button colorScheme='blue' onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1 || qtyPackage.length < 1}>
             Create        
           </Button>
-          <Button>
+          <Button colorScheme='blue'>
             <Link href="/home/newMed">
               Finish
             </Link>

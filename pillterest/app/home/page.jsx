@@ -70,8 +70,8 @@ export default function Home() {
   }, [router, user])
 
   return (
-    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }}>
-      <VStack spacing={5} align='stretch'>
+    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }} backgroundColor='purple.50'>
+      <VStack spacing={5} align='stretch' colorScheme='purple.100'>
       <InputGroup>
         <InputRightElement>
           <Button onClick={logout} colorScheme="blue" width={{base: 'sm', sm: 'sm'}}>
@@ -79,7 +79,7 @@ export default function Home() {
           </Button>
         </InputRightElement>
       </InputGroup>
-      <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
+      <Stack spacing={{ base: '2', md: '3' }} textAlign="center" colorScheme='purple.100'>
           <Image src="https://drive.google.com/file/d/1KW8MRDN78HmjmjhKgQ7nU83HailOYK9X/view?usp=sharing" alt="pillterest_logo"/>
         </Stack>
       </VStack>
@@ -93,15 +93,16 @@ export default function Home() {
           bg={{ base: 'bg-surface', sm: 'bg-surface' }}
           boxShadow={{ base: 'md', sm: 'md' }}
           borderRadius={{ base: 'md', sm: 'xl' }}
+          backgroundColor='purple.100'
         >
           <Heading size={{ base: 'sm', md: 'md' }}>Upcoming Medication</Heading>
-          <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.100' />}>
+          <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
             {notification && notification.map((docSnap) =>
                 <Box key={docSnap.id} h='40px'>
                   <Heading size='xs'>{docSnap.medicationName}</Heading>
                   <InputGroup>
                     <InputRightElement>
-                      <Checkbox checked></Checkbox>                    
+                      <Checkbox checked borderColor='black'></Checkbox>                    
                     </InputRightElement>
                   </InputGroup>
                   <Text size='xs'>I took {docSnap.frequencyPerDay} times the medication</Text>
