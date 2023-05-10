@@ -110,7 +110,7 @@ export default function NewMed() {
           <Input borderColor='black' placeholder='Frequency per day' value={freqPerDay} onChange={(e) => setFreqPerDay(e.target.value)} />
           <Input type="datetime-local" borderColor='black' placeholder='Day the treatment starts' value={timeTreatmentStart} onChange={(e) => setTimeTreatmentStart(e.target.value)} />
           <Input type="datetime-local" borderColor='black' placeholder='Day the treatment ends' value={timeTreatmentEnd} onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
-          <Button colorScheme='blue' onClick={() => handleAddMed()} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeOfTreatment.length < 1}>
+          <Button colorScheme='blue' onClick={() => handleAddMed()} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeTreatmentStart.length < 1 || timeTreatmentEnd.length < 1}>
             Add
           </Button>
           <Button colorScheme='blue'>
