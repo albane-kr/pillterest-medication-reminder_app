@@ -3,7 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { Container, Heading, Box, Input, Button, Stack, Select, HStack, useToast } from "@chakra-ui/react";
-import { addMed, toggleMedName } from '@/backend/firebase/firestore/db'
+import { addMed, createNotification, toggleMedName } from '@/backend/firebase/firestore/db'
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/backend/context/authContext';
 import { db } from "@/backend/firebase/firebaseConfig";
@@ -80,6 +80,23 @@ export default function NewMed() {
     })
   }
 
+  const handleCreateNotif = async () => {
+    const newNotif = {
+      medName,
+      uid: user.uid,
+      freqPerDay,
+      timeTreatmentStart,
+      timeTreatmentEnd,
+      date:"1900-01-01"
+    }
+
+    await createNotification(newNotif)
+    setMedName("")
+    setFreqPerDay("")
+    setTimeTreatmentStart("")
+    setTimeTreatmentEnd("")
+  }
+
   return (
     <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '0', sm: '8' }} backgroundColor='purple.50'>
       <Stack spacing="8">
@@ -110,7 +127,7 @@ export default function NewMed() {
           <Input borderColor='black' placeholder='Frequency per day' value={freqPerDay} onChange={(e) => setFreqPerDay(e.target.value)} />
           <Input type="datetime-local" borderColor='black' placeholder='Day the treatment starts' value={timeTreatmentStart} onChange={(e) => setTimeTreatmentStart(e.target.value)} />
           <Input type="datetime-local" borderColor='black' placeholder='Day the treatment ends' value={timeTreatmentEnd} onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
-          <Button colorScheme='blue' onClick={() => handleAddMed()} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeTreatmentStart.length < 1 || timeTreatmentEnd.length < 1}>
+          <Button colorScheme='blue' onClick={() => {handleAddMed(), handleCreateNotif()}} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeTreatmentStart.length < 1 || timeTreatmentEnd.length < 1 || timeTreatmentStart > timeTreatmentEnd}>
             Add
           </Button>
           <Button colorScheme='blue'>
