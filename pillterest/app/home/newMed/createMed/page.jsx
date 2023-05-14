@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Container, Heading, Box, Input, Button, Textarea, Stack, Select, } from "@chakra-ui/react";
+import { Container, Heading, Box, Input, Button, Stack, Select, } from "@chakra-ui/react";
 import { createMed, toggleDrugAdminType } from '@/backend/firebase/firestore/db'
 
 
