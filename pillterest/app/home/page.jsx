@@ -2,40 +2,23 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Box, Button, Checkbox, InputGroup, InputRightElement, Skeleton, Container, Heading, VStack, StackDivider, HStack, Input, Stack, Text, Image, Icon } from '@chakra-ui/react'
+import { Box, Button, Checkbox, InputGroup, InputRightElement, Container, Heading, VStack, StackDivider, HStack, Stack, Text, Image, Icon, useToast } from '@chakra-ui/react'
 import { useAuthContext } from '@/backend/context/authContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { auth } from '@/backend/firebase/firebaseConfig'
 import { db } from "@/backend/firebase/firebaseConfig";
-import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, updateDoc, doc } from "firebase/firestore";
 import { FaSignOutAlt } from 'react-icons/fa'
-import { onMessage } from "firebase/messaging"
-import { getMessaging, onBackgroundMessage} from "firebase/messaging/sw"
+import { historyNotif, updateNotification } from '@/backend/firebase/firestore/db'
 
 export default function Home() {
   const { user } = useAuthContext()
   const router = useRouter()
+  const toast = useToast();
 
-  /*cloud messaging
-  const messaging = getMessaging();
-  onMessage(messaging, (payload) => {
-  console.log('Message received. ', payload);
-  });
-  onBackgroundMessage(messaging, (payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
-    // Customize notification here
-    const notificationTitle = 'Background Message Title';
-    const notificationOptions = {
-      body: 'Background Message body.',
-      icon: '/firebase-logo.png'
-    };
-  
-    self.registration.showNotification(notificationTitle,
-      notificationOptions);
-  });*/
-
-  const [notification, setNotification] =useState([])
+  //const [notificationChecked, setNotificationChecked] = useState([])
+  const [notificationUnchecked, setNotificationUnchecked] = useState([])
 
   const logout = () => {
     auth.signOut()
@@ -47,40 +30,89 @@ export default function Home() {
       return
     }
 
-    //get data from documents of the collection "Prescribed_Med" 
-    //and push them into an array to be able to map the different documents to display
-    const collPrescribedMed = collection(db, "Prescribed_Med")
-    const qPrescMed = query(collPrescribedMed)
-    console.log(qPrescMed)
-    const querySnapshot = await getDocs(qPrescMed, where("timeOfTreatment", "!==", null))
-    let array = []
-    querySnapshot.forEach((docSnap) => {
-      array.push({id : docSnap.id, ...docSnap.data()})
-      console.log(docSnap.id, " => ", docSnap.data())
-      console.log(querySnapshot.size)
-      setNotification(array)
-    });
+    const collNotifications = collection(db, "Notifications")
+    //get checked notifications of the day
+    /*const querySnapshotCheckedNotif = await getDocs(query(collNotifications, where("date", "==", dateToday)))
+    let arrayCheckedNotif = []
+    querySnapshotCheckedNotif.forEach((docSnapCheckedNotif) => {
+      arrayCheckedNotif.push({ id: docSnapCheckedNotif, ...docSnapCheckedNotif.data() })
+      console.log("checkedNotif: ", { id: docSnapCheckedNotif, ...docSnapCheckedNotif.data() })
+      setNotificationChecked(arrayCheckedNotif)
+    })*/
+    //get unchecked notifications of the day
+    //const querySnapshotUncheckedNotif = await getDocs(query(collNotifications, where(("timeTreatmentStart", "<==", dateToday) && ("timeTreatmentEnd", ">==", dateToday))))
+    const querySnapshotUncheckedNotif = await getDocs(query(collNotifications))
+    let arrayUncheckedNotif = []
+    querySnapshotUncheckedNotif.forEach((docSnapUncheckedNotif) => {
+      arrayUncheckedNotif.push({ id: docSnapUncheckedNotif.id, ...docSnapUncheckedNotif.data() })
+      console.log("uncheckedNotif: ", { id: docSnapUncheckedNotif.id, ...docSnapUncheckedNotif.data() })
+      setNotificationUnchecked(arrayUncheckedNotif)
+      //console.log(docSnapUncheckedNotif.data().timeTreatmentStart)
+    })
 
   }
 
-  useEffect( () => {
-    if ( user == null ) router.push('/')
+
+  //converts number to string 
+  //then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
+  function pad2Digits(n) {
+    return n.toString().padStart(2, '0');
+  }
+  //date in format yyyy-mm-dd
+  function formatDate(date) {
+    return [
+      date.getFullYear(),
+      pad2Digits(date.getMonth() + 1),
+      pad2Digits(date.getDate()),
+    ].join('-');
+  }
+  const dateToday = formatDate(new Date());
+  console.log(dateToday)
+
+
+  const handleUpdateNotif = async (docId, medName) => {
+    const dataToUpdate = {
+      date: dateToday
+    }
+    updateNotification(docId, dataToUpdate)
+    toast({
+      title: "Date added with success",
+      status: "success"
+    })
+
+    const dateHistory = {
+      medicationName: medName,
+      uid: user.uid,
+      dateToday: [dateToday]
+    }
+    historyNotif(docId, dateHistory)
+    toast({
+      title: "History updated with success",
+      status: "success"
+    })
+  }
+
+  useEffect(() => {
+    //if user not logged in, return to root page
+    if (user == null) router.push('/')
     refreshData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, user])
+
+
 
   return (
     <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }} backgroundColor='purple.50'>
-      <VStack spacing={5} align='stretch' colorScheme='purple.100'>
-      <InputGroup>
-        <InputRightElement>
-          <Button onClick={logout} colorScheme="blue" width={{base: 'sm', sm: 'sm'}}>
-            <Icon as={FaSignOutAlt} />
-          </Button>
-        </InputRightElement>
-      </InputGroup>
-      <Stack spacing={{ base: '2', md: '3' }} textAlign="center" colorScheme='purple.100'>
-          <Image src="https://drive.google.com/file/d/1KW8MRDN78HmjmjhKgQ7nU83HailOYK9X/view?usp=sharing" alt="pillterest_logo"/>
+      <VStack spacing={5} align='stretch' s='purple.100'>
+        <InputGroup>
+          <InputRightElement>
+            <Button onClick={logout} colorScheme="blue" width={{ base: 'sm', sm: 'sm' }}>
+              <Icon as={FaSignOutAlt} />
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+        <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
+          <Image src="https://drive.google.com/file/d/1KW8MRDN78HmjmjhKgQ7nU83HailOYK9X/view?usp=sharing" alt="pillterest_logo" />
         </Stack>
       </VStack>
       <Stack spacing="8">
@@ -97,16 +129,24 @@ export default function Home() {
         >
           <Heading size={{ base: 'sm', md: 'md' }}>Upcoming Medication</Heading>
           <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
-            {notification && notification.map((docSnap) =>
-                <Box key={docSnap.id} h='40px'>
-                  <Heading size='xs'>{docSnap.medicationName}</Heading>
-                  <InputGroup>
-                    <InputRightElement>
-                      <Checkbox checked borderColor='black'></Checkbox>                    
-                    </InputRightElement>
-                  </InputGroup>
-                  <Text size='xs'>I took {docSnap.frequencyPerDay} times the medication</Text>
-                </Box>
+            {notificationUnchecked && notificationUnchecked.map((docSnapUncheckedNotif) =>
+              <Box key={docSnapUncheckedNotif.id} h='40px'>
+                <Heading size='xs'>{docSnapUncheckedNotif.medicationName}</Heading>
+                <InputGroup>
+                  <InputRightElement>
+                    <Checkbox
+                      checked
+                      onChange={() => {
+                        if (docSnapUncheckedNotif.date.substr(0, 9) !== dateToday) {
+                          handleUpdateNotif(docSnapUncheckedNotif.id, docSnapUncheckedNotif.medicationName)
+                        }
+                      }}
+                      borderColor='black'></Checkbox>
+                    {console.log(docSnapUncheckedNotif.date.substr(0, 10))}
+                  </InputRightElement>
+                </InputGroup>
+                <Text size='xs'>I took {docSnapUncheckedNotif.frequencyPerDay} times the medication</Text>
+              </Box>
             )}
           </VStack>
         </Box>
