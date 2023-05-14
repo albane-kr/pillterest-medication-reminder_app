@@ -2,10 +2,10 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Box, IconButton, Button, SimpleGrid, Card, CardHeader, CardBody, CardFooter, Checkbox, InputGroup, InputRightElement, Skeleton, Container, Heading, VStack, StackDivider, HStack, Input, Stack, Text, useToast, Badge } from '@chakra-ui/react'
+import { Box, VStack, Button, Container, Heading, StackDivider, Stack, Text, useToast, Badge } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { db } from "@/backend/firebase/firebaseConfig";
-import { collection, query, getDocs } from "firebase/firestore";
+import { collection, query, getDocs, where } from "firebase/firestore";
 import { deleteMed } from '@/backend/firebase/firestore/db'
 import { useAuth } from '@/backend/context/authContext'
 
@@ -16,24 +16,28 @@ export default function Cabinet() {
   const { user } = useAuth()
   const toast = useToast()
 
+  
+
   const refreshData = async () => {
     if (!user) {
       setMed([])
+      
       return
     }
 
     //get data from documents of the collection "Prescribed_Med" 
     //and push them into an array to be able to map the different documents to display
     const collPrescribedMed = collection(db, "Prescribed_Med")
-    const qPrescMed = query(collPrescribedMed)
-    console.log(qPrescMed)
-    const querySnapshot = await getDocs(qPrescMed);
+    const querySnapshot = await getDocs(query(collPrescribedMed, where("uid", "==", user.uid)));
+    
+    console.log(user.uid)
+    console.log(querySnapshot)
     let array = []
     querySnapshot.forEach((docSnap) => {
       array.push({id : docSnap.id, ...docSnap.data()})
-      console.log(docSnap.id, " => ", docSnap.data());
-      console.log(querySnapshot.size)
-      setMed(array)
+      //console.log(docSnap.id, " => ", docSnap.data());
+      //console.log(querySnapshot.size)
+      setMed(array) 
     });
   }
 
@@ -51,7 +55,7 @@ export default function Cabinet() {
   }  
 
   return (
-    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '0', sm: '8' }} backgroundColor='purple.50'>
+    <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }} backgroundColor='purple.50'>
       <Stack spacing="8">
         <Stack spacing="8" textAlign="center">
           <Heading size={{ base: 'md', md: 'lg' }}>
@@ -62,8 +66,15 @@ export default function Cabinet() {
           <Heading size={{ base: 'sm', md: 'md' }}>
             Your current treatment
           </Heading>
-          <Box mt={6}>
-            <SimpleGrid column={{base: 'xs', sm: 'sm'}} spacing={8}>
+          <Box 
+          py={{ base: '4', sm: '8' }}
+          px={{ base: '4', sm: '10' }}
+          bg={{ base: 'bg-surface', sm: 'bg-surface' }}
+          boxShadow={{ base: 'md', sm: 'md' }}
+          borderRadius={{ base: 'md', sm: 'xl' }}
+          backgroundColor='purple.100'
+          >
+            <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
               {med && med.map((docSnap) =>
                 <Box key={docSnap.id}>
                   <Heading size={{ base: 'xs', md: 'sm' }}>
@@ -74,10 +85,10 @@ export default function Cabinet() {
                   </Heading>
                   <Text>Quantity: {docSnap.quantityPerTake}</Text>
                   <Text>Frequency: {docSnap.frequencyPerDay}</Text>
-                  <Text>Time of treatment: {docSnap.timeOfTreatment}</Text>
+                  <Text>Time of treatment: {docSnap.timeTreatmentStart} - {docSnap.timeTreatmentEnd}</Text>
                 </Box>
               )}
-            </SimpleGrid>
+            </VStack>
           </Box>
         </Stack>
         <Button colorScheme='blue'>
