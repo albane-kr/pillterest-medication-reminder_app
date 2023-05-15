@@ -32,7 +32,7 @@ export default function Home() {
 
     //get unchecked notifications of the day
     const collNotifications = collection(db, "Notifications")
-    const querySnapshotUncheckedNotif = await getDocs(query(collNotifications))
+    const querySnapshotUncheckedNotif = await getDocs(query(collNotifications, where("uid", "==", user.uid)))
     let arrayUncheckedNotif = []
     querySnapshotUncheckedNotif.forEach((docSnapUncheckedNotif) => {
       arrayUncheckedNotif.push({ id: docSnapUncheckedNotif.id, ...docSnapUncheckedNotif.data() })
@@ -43,7 +43,7 @@ export default function Home() {
 
     //get checked notifications of the day
     const collHistoryNotif = collection(db, "History_Notifications")
-    const querySnapshotHistoryNotif = await getDocs(query(collHistoryNotif))
+    const querySnapshotHistoryNotif = await getDocs(query(collHistoryNotif, where("uid", "==", user.uid)))
     let arrayHistoryNotif = []
     querySnapshotHistoryNotif.forEach((docSnapHistoryNotif) => {
       arrayHistoryNotif.push({ id: docSnapHistoryNotif.id, ...docSnapHistoryNotif.data() })
