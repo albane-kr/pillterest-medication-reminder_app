@@ -137,6 +137,7 @@ var i=0
                   <InputRightElement>
                     <Checkbox
                       checked
+                      isDisabled={docSnapUncheckedNotif.date.substr(0, 10) == dateToday}
                       onChange={() => {
                         if (docSnapUncheckedNotif.date.substr(0, 10) !== dateToday && docSnapUncheckedNotif.timeTreatmentStart.substr(0, 10) <= dateToday && docSnapUncheckedNotif.timeTreatmentEnd.substr(0, 10) >= dateToday ) {
                           handleUpdateNotif(docSnapUncheckedNotif.id, docSnapUncheckedNotif.medicationName)
@@ -161,7 +162,7 @@ var i=0
                 <InputGroup>
                   <InputRightElement>
                     <Checkbox
-                      defaultChecked
+                      defaultChecked={docSnapHistoryNotif.date == dateToday}
                       borderColor='black'
                     ></Checkbox>
                   </InputRightElement>
