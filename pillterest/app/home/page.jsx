@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { auth } from '@/backend/firebase/firebaseConfig'
 import { db } from "@/backend/firebase/firebaseConfig";
-import { collection, query, where, getDocs, orderBy, updateDoc, doc } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, doc, } from "firebase/firestore";
 import { FaSignOutAlt } from 'react-icons/fa'
 import { historyNotif, updateNotification } from '@/backend/firebase/firestore/db'
 
@@ -17,7 +17,7 @@ export default function Home() {
   const router = useRouter()
   const toast = useToast();
 
-  //const [notificationChecked, setNotificationChecked] = useState([])
+  const [notificationChecked, setNotificationChecked] = useState([])
   const [notificationUnchecked, setNotificationUnchecked] = useState([])
 
   const logout = () => {
@@ -30,17 +30,8 @@ export default function Home() {
       return
     }
 
-    const collNotifications = collection(db, "Notifications")
-    //get checked notifications of the day
-    /*const querySnapshotCheckedNotif = await getDocs(query(collNotifications, where("date", "==", dateToday)))
-    let arrayCheckedNotif = []
-    querySnapshotCheckedNotif.forEach((docSnapCheckedNotif) => {
-      arrayCheckedNotif.push({ id: docSnapCheckedNotif, ...docSnapCheckedNotif.data() })
-      console.log("checkedNotif: ", { id: docSnapCheckedNotif, ...docSnapCheckedNotif.data() })
-      setNotificationChecked(arrayCheckedNotif)
-    })*/
     //get unchecked notifications of the day
-    //const querySnapshotUncheckedNotif = await getDocs(query(collNotifications, where(("timeTreatmentStart", "<==", dateToday) && ("timeTreatmentEnd", ">==", dateToday))))
+    const collNotifications = collection(db, "Notifications")
     const querySnapshotUncheckedNotif = await getDocs(query(collNotifications))
     let arrayUncheckedNotif = []
     querySnapshotUncheckedNotif.forEach((docSnapUncheckedNotif) => {
@@ -50,6 +41,16 @@ export default function Home() {
       //console.log(docSnapUncheckedNotif.data().timeTreatmentStart)
     })
 
+    //get checked notifications of the day
+    const collHistoryNotif = collection(db, "History_Notifications")
+    const querySnapshotHistoryNotif = await getDocs(query(collHistoryNotif))
+    let arrayHistoryNotif = []
+    querySnapshotHistoryNotif.forEach((docSnapHistoryNotif) => {
+      arrayHistoryNotif.push({ id: docSnapHistoryNotif.id, ...docSnapHistoryNotif.data() })
+      console.log("checkedNotif: ", { id: docSnapHistoryNotif.id, ...docSnapHistoryNotif.data() })
+      setNotificationChecked(arrayHistoryNotif)
+      console.log(docSnapHistoryNotif.data().date)
+    })
   }
 
 
@@ -83,7 +84,7 @@ export default function Home() {
     const dateHistory = {
       medicationName: medName,
       uid: user.uid,
-      dateToday: [dateToday]
+      date: [dateToday]
     }
     historyNotif(docId, dateHistory)
     toast({
@@ -99,8 +100,7 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, user])
 
-
-
+var i=0
   return (
     <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }} backgroundColor='purple.50'>
       <VStack spacing={5} align='stretch' s='purple.100'>
@@ -130,6 +130,7 @@ export default function Home() {
           <Heading size={{ base: 'sm', md: 'md' }}>Upcoming Medication</Heading>
           <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
             {notificationUnchecked && notificationUnchecked.map((docSnapUncheckedNotif) =>
+              //{if(docSnapUncheckedNotif.timeTreatmentStart.substr(0, 10) <= dateToday && docSnapUncheckedNotif.timeTreatmentEnd.substr(0, 10) >= dateToday) {
               <Box key={docSnapUncheckedNotif.id} h='40px'>
                 <Heading size='xs'>{docSnapUncheckedNotif.medicationName}</Heading>
                 <InputGroup>
@@ -137,17 +138,38 @@ export default function Home() {
                     <Checkbox
                       checked
                       onChange={() => {
-                        if (docSnapUncheckedNotif.date.substr(0, 9) !== dateToday) {
+                        if (docSnapUncheckedNotif.date.substr(0, 10) !== dateToday && docSnapUncheckedNotif.timeTreatmentStart.substr(0, 10) <= dateToday && docSnapUncheckedNotif.timeTreatmentEnd.substr(0, 10) >= dateToday ) {
                           handleUpdateNotif(docSnapUncheckedNotif.id, docSnapUncheckedNotif.medicationName)
+                        } else {
+                          toast({title:"conditions don't match", status:"error"})
                         }
                       }}
-                      borderColor='black'></Checkbox>
+                      borderColor='black'
+                    ></Checkbox>
                     {console.log(docSnapUncheckedNotif.date.substr(0, 10))}
                   </InputRightElement>
                 </InputGroup>
                 <Text size='xs'>I took {docSnapUncheckedNotif.frequencyPerDay} times the medication</Text>
               </Box>
+              //}}
             )}
+            {notificationChecked && notificationChecked.map((docSnapHistoryNotif) =>
+              //how can I check if the date is == to an item ?
+              //{if(dateToday == docSnapHistoryNotif.date){
+              <Box key={docSnapHistoryNotif.id} h='40px'>
+                <Heading size='xs'>{docSnapHistoryNotif.medicationName}</Heading>
+                <InputGroup>
+                  <InputRightElement>
+                    <Checkbox
+                      defaultChecked
+                      borderColor='black'
+                    ></Checkbox>
+                  </InputRightElement>
+                </InputGroup>
+                </Box>
+              //}}
+            )}
+
           </VStack>
         </Box>
         <Stack spacing="6">
@@ -164,7 +186,6 @@ export default function Home() {
             </Button>
           </HStack>
         </Stack>
-
       </Stack>
     </Container>
   )
