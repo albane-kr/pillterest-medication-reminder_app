@@ -10,7 +10,6 @@ export default function CreateMed() {
 
   const [medName, setMedName] = useState("")
   const [drugAdminType, setDrugAdminTime] = useState("")
-  const [qtyPackage, setQtyPackage] = useState("")
   
   const handleCreateMed = async () => {
   
@@ -19,7 +18,6 @@ export default function CreateMed() {
     await createMed(createNewMed)
     setMedName("")
     setDrugAdminTime("")
-    setQtyPackage("")
   }
 
   return (
@@ -40,7 +38,6 @@ export default function CreateMed() {
           <Select borderColor='black' placeholder='Drug Administration Type' value={drugAdminType} onChange={(e) => setDrugAdminTime(e.target.value)}>
             <option value={"pills"}>pills</option>
           </Select>
-          <Input borderColor='black' placeholder='Quantity of pills per package' value={qtyPackage} onChange={(e) => setQtyPackage(e.target.value)} />
           <Button colorScheme='blue' onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1 || qtyPackage.length < 1}>
             Create        
           </Button>
