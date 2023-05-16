@@ -52,6 +52,9 @@ export default function Cabinet() {
       deleteMed(id)
       toast({ title: "Prescribed medication deleted successfully", status:"success"})
     }
+
+    //to update database
+    refreshData()
   }  
 
   return (
