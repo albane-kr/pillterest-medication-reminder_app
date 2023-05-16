@@ -6,18 +6,15 @@ import { collection, addDoc, updateDoc, doc, deleteDoc, setDoc } from 'firebase/
 const createMed = async ({
     medName,
     drugAdminType,
-    qtyPackage
 }) => {
     try {
         if (
             medName !== ""
             && drugAdminType !== ""
-            && qtyPackage !== 0
         ) {
             const docRef = await addDoc(collection(db, "Medications"), {
                 medicationName: medName,
                 drugAdministrationType: drugAdminType,
-                quantityPerPackage: qtyPackage,
             })
             console.log(docRef.id)
         }
@@ -93,6 +90,7 @@ const deleteMed = async (docId) => {
 const createNotification = async ({
     medName,
     uid,
+    qtyPerTake,
     freqPerDay,
     timeTreatmentStart,
     timeTreatmentEnd,
@@ -107,18 +105,13 @@ const createNotification = async ({
             const notif = await addDoc(collection(db, "Notifications"), {
                 medicationName: medName,
                 uid: uid,
+                quantityPerTake: qtyPerTake,
                 frequencyPerDay: freqPerDay,
                 timeTreatmentStart: timeTreatmentStart,
                 timeTreatmentEnd: timeTreatmentEnd,
                 date: date
             })
             console.log(notif.id)
-
-            const historyEvent = await addDoc(collection(db, "History_Notifications"), {
-                medicationName: medName,
-                uid: uid,
-            })
-            console.log(historyEvent.id)
         }
     } catch (e) {
         console.log(e)
@@ -134,14 +127,6 @@ const updateNotification = async (docId, date) => {
     }
 }
 
-const historyNotif = async (docId, date) => {
-    try {
-        const historyNotifRef = doc(db, "History_Notifications", docId)
-        await setDoc(historyNotifRef, date, { merge:true })
-    } catch (e) {
-        console.log(e)
-    }
-}
 
 
-export { createMed, toggleDrugAdminType, addMed, toggleMedName, deleteMed, createNotification, updateNotification, historyNotif } 
+export { createMed, toggleDrugAdminType, addMed, toggleMedName, deleteMed, createNotification, updateNotification} 
