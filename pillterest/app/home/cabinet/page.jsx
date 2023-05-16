@@ -8,19 +8,43 @@ import { db } from "@/backend/firebase/firebaseConfig";
 import { collection, query, getDocs, where } from "firebase/firestore";
 import { deleteMed } from '@/backend/firebase/firestore/db'
 import { useAuth } from '@/backend/context/authContext'
+import { formatDate } from '../page'
 
 
 export default function Cabinet() {
 
-  const [med, setMed] = useState([])
+  const [currentMed, setCurrentMed] = useState([])
+  const [futureMed, setFutureMed] = useState([])
+  const [pastMed, setPastMed] = useState([])
   const { user } = useAuth()
   const toast = useToast()
 
-  
+  const dateToday = formatDate(new Date());
+
+  function isCurrentMed(med) {
+    return(
+      med.timeTreatmentStart <= dateToday
+      && med.timeTreatmentEnd >= dateToday
+    )
+  }
+
+  function isFutureMed(med) {
+    return(
+      med.timeTreatmentStart >= dateToday
+    )
+  }
+
+  function isPastMed(med) {
+    return(
+      med.timeTreatmentEnd <= dateToday
+    )
+  }
 
   const refreshData = async () => {
     if (!user) {
-      setMed([])
+      setCurrentMed([])
+      setFutureMed([])
+      setPastMed([])
       
       return
     }
@@ -29,15 +53,28 @@ export default function Cabinet() {
     //and push them into an array to be able to map the different documents to display
     const collPrescribedMed = collection(db, "Prescribed_Med")
     const querySnapshot = await getDocs(query(collPrescribedMed, where("uid", "==", user.uid)));
-    
     console.log(user.uid)
     console.log(querySnapshot)
-    let array = []
+    let arrayCurrentMed = []
+    let arrayFutureMed = []
+    let arrayPastMed = []
     querySnapshot.forEach((docSnap) => {
-      array.push({id : docSnap.id, ...docSnap.data()})
+      if (isCurrentMed(docSnap.data())) {
+      arrayCurrentMed.push({id : docSnap.id, ...docSnap.data()})
       //console.log(docSnap.id, " => ", docSnap.data());
-      //console.log(querySnapshot.size)
-      setMed(array) 
+        //console.log(querySnapshot.size)
+      setCurrentMed(arrayCurrentMed)
+      } else if (isFutureMed(docSnap.data())) {
+        arrayFutureMed.push({id : docSnap.id, ...docSnap.data()})
+        //console.log(docSnap.id, " => ", docSnap.data());
+        //console.log(querySnapshot.size)
+      setFutureMed(arrayFutureMed)
+      } else {
+        arrayPastMed.push({id : docSnap.id, ...docSnap.data()})
+        //console.log(docSnap.id, " => ", docSnap.data());
+        //console.log(querySnapshot.size)
+        setPastMed(arrayPastMed)
+      }
     });
   }
 
@@ -78,7 +115,61 @@ export default function Cabinet() {
           backgroundColor='purple.100'
           >
             <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
-              {med && med.map((docSnap) =>
+              {currentMed && currentMed.map((docSnap) =>
+                <Box key={docSnap.id}>
+                  <Heading size={{ base: 'xs', md: 'sm' }}>
+                    {docSnap.medicationName}{" "}
+                    <Badge color="blue" onClick={() => handleMedDelete(docSnap.id)}>
+                      <DeleteIcon />
+                    </Badge>
+                  </Heading>
+                  <Text>Quantity: {docSnap.quantityPerTake}</Text>
+                  <Text>Frequency: {docSnap.frequencyPerDay}</Text>
+                  <Text>Time of treatment: {docSnap.timeTreatmentStart} - {docSnap.timeTreatmentEnd}</Text>
+                </Box>
+              )}
+            </VStack>
+          </Box>
+          <Heading size={{ base: 'sm', md: 'md' }}>
+            Your future treatment
+          </Heading>
+          <Box 
+          py={{ base: '4', sm: '8' }}
+          px={{ base: '4', sm: '10' }}
+          bg={{ base: 'bg-surface', sm: 'bg-surface' }}
+          boxShadow={{ base: 'md', sm: 'md' }}
+          borderRadius={{ base: 'md', sm: 'xl' }}
+          backgroundColor='purple.100'
+          >
+            <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
+              {futureMed && futureMed.map((docSnap) =>
+                <Box key={docSnap.id}>
+                  <Heading size={{ base: 'xs', md: 'sm' }}>
+                    {docSnap.medicationName}{" "}
+                    <Badge color="blue" onClick={() => handleMedDelete(docSnap.id)}>
+                      <DeleteIcon />
+                    </Badge>
+                  </Heading>
+                  <Text>Quantity: {docSnap.quantityPerTake}</Text>
+                  <Text>Frequency: {docSnap.frequencyPerDay}</Text>
+                  <Text>Time of treatment: {docSnap.timeTreatmentStart} - {docSnap.timeTreatmentEnd}</Text>
+                </Box>
+              )}
+            </VStack>
+          </Box>
+          <Heading size={{ base: 'sm', md: 'md' }}>
+            Your past treatment
+          </Heading>
+          <Box 
+          py={{ base: '4', sm: '8' }}
+          px={{ base: '4', sm: '10' }}
+          bg={{ base: 'bg-surface', sm: 'bg-surface' }}
+          boxShadow={{ base: 'md', sm: 'md' }}
+          borderRadius={{ base: 'md', sm: 'xl' }}
+          backgroundColor='purple.100'
+          >
+            <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
+              {pastMed && pastMed.map((docSnap) =>
                 <Box key={docSnap.id}>
                   <Heading size={{ base: 'xs', md: 'sm' }}>
                     {docSnap.medicationName}{" "}
