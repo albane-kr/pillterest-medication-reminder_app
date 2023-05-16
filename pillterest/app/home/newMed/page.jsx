@@ -78,23 +78,31 @@ export default function NewMed() {
       title: "Prescribed medication created successfully",
       status: "success"
     })
+
+    //to update database
+    refreshData()
   }
 
   const handleCreateNotif = async () => {
     const newNotif = {
       medName,
       uid: user.uid,
+      qtyPerTake,
       freqPerDay,
       timeTreatmentStart,
       timeTreatmentEnd,
-      date:"1900-01-01"
+      date:["1900-01-01"]
     }
 
     await createNotification(newNotif)
     setMedName("")
+    setQtyPerTake("")
     setFreqPerDay("")
     setTimeTreatmentStart("")
     setTimeTreatmentEnd("")
+
+    //to update database
+    refreshData()
   }
 
   return (
