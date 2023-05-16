@@ -12,6 +12,20 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { FaSignOutAlt } from 'react-icons/fa'
 import { historyNotif, updateNotification } from '@/backend/firebase/firestore/db'
 
+//converts number to string 
+//then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
+export function pad2Digits(n) {
+    return n.toString().padStart(2, '0');
+  }
+  //date in format yyyy-mm-dd
+export function formatDate(date) {
+    return [
+      date.getFullYear(),
+      pad2Digits(date.getMonth() + 1),
+      pad2Digits(date.getDate()),
+    ].join('-');
+  }
+
 export default function Home() {
   const { user } = useAuthContext()
   const router = useRouter()
@@ -24,6 +38,7 @@ export default function Home() {
     auth.signOut()
   }
 
+  /*
   //converts number to string 
   //then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
   function pad2Digits(n) {
@@ -36,7 +51,7 @@ export default function Home() {
       pad2Digits(date.getMonth() + 1),
       pad2Digits(date.getDate()),
     ].join('-');
-  }
+  }*/
   const dateToday = formatDate(new Date());
   console.log(dateToday)
 
