@@ -47,7 +47,7 @@ export default function Home() {
   }
 
   const dateToday = formatDate(new Date());
-  console.log("date of today: ",dateToday)
+  console.log("date of today: ", dateToday)
   const dateTomorrow = formatNextDate(new Date())
 
 
@@ -71,7 +71,7 @@ export default function Home() {
     querySnapshotUncheckedNotif.forEach((docSnapNotifToCheck) => {
       if (notificationCondition(docSnapNotifToCheck.data())) {
         arrayNotifToCheck.push({ id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
-        console.log("uncheckedNotif: ", { id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
+        console.log({ id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
         setNotificationToCheck(arrayNotifToCheck)
       }
       //console.log(docSnapNotifToCheck.data().timeTreatmentStart)
@@ -83,18 +83,18 @@ export default function Home() {
       const dataToUpdate = {
         date: [...doc.date, dateToday]
       }
-    updateNotification(doc.id, dataToUpdate)
-    toast({
-      title: "Date added with success",
-      status: "success"
-    })
-  } else {
-    deleteDate(doc.id, dateToday)
-    toast({
-      title: "Date deleted with success",
-      status: "success"
-    })
-  }
+      updateNotification(doc.id, dataToUpdate)
+      toast({
+        title: "Date added with success",
+        status: "success"
+      })
+    } else {
+      deleteDate(doc.id, dateToday)
+      toast({
+        title: "Date deleted with success",
+        status: "success"
+      })
+    }
 
 
     //to update database

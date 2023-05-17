@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Box, VStack, Button, Container, Heading, StackDivider, Stack, Text, useToast, Badge } from '@chakra-ui/react'
+import { Box, VStack, Button, Container, Heading, StackDivider, Stack, Text, useToast, Badge, HStack } from '@chakra-ui/react'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { db } from "@/backend/firebase/firebaseConfig";
 import { collection, query, getDocs, where } from "firebase/firestore";
@@ -22,20 +22,20 @@ export default function Cabinet() {
   const dateToday = formatDate(new Date());
 
   function isCurrentMed(med) {
-    return(
+    return (
       med.timeTreatmentStart <= dateToday
       && med.timeTreatmentEnd >= dateToday
     )
   }
 
   function isFutureMed(med) {
-    return(
+    return (
       med.timeTreatmentStart >= dateToday
     )
   }
 
   function isPastMed(med) {
-    return(
+    return (
       med.timeTreatmentEnd <= dateToday
     )
   }
@@ -45,7 +45,7 @@ export default function Cabinet() {
       setCurrentMed([])
       setFutureMed([])
       setPastMed([])
-      
+
       return
     }
 
@@ -60,17 +60,17 @@ export default function Cabinet() {
     let arrayPastMed = []
     querySnapshot.forEach((docSnap) => {
       if (isCurrentMed(docSnap.data())) {
-      arrayCurrentMed.push({id : docSnap.id, ...docSnap.data()})
-      //console.log(docSnap.id, " => ", docSnap.data());
-        //console.log(querySnapshot.size)
-      setCurrentMed(arrayCurrentMed)
-      } else if (isFutureMed(docSnap.data())) {
-        arrayFutureMed.push({id : docSnap.id, ...docSnap.data()})
+        arrayCurrentMed.push({ id: docSnap.id, ...docSnap.data() })
         //console.log(docSnap.id, " => ", docSnap.data());
         //console.log(querySnapshot.size)
-      setFutureMed(arrayFutureMed)
+        setCurrentMed(arrayCurrentMed)
+      } else if (isFutureMed(docSnap.data())) {
+        arrayFutureMed.push({ id: docSnap.id, ...docSnap.data() })
+        //console.log(docSnap.id, " => ", docSnap.data());
+        //console.log(querySnapshot.size)
+        setFutureMed(arrayFutureMed)
       } else {
-        arrayPastMed.push({id : docSnap.id, ...docSnap.data()})
+        arrayPastMed.push({ id: docSnap.id, ...docSnap.data() })
         //console.log(docSnap.id, " => ", docSnap.data());
         //console.log(querySnapshot.size)
         setPastMed(arrayPastMed)
@@ -80,19 +80,19 @@ export default function Cabinet() {
 
   useEffect(() => {
     refreshData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
-  
+
   const handleMedDelete = async (id) => {
     if (confirm("Are you sure you want to delete this medication ?")) {
       deleteMed(id)
-      toast({ title: "Prescribed medication deleted successfully", status:"success"})
+      toast({ title: "Prescribed medication deleted successfully", status: "success" })
     }
 
     //to update database
     refreshData()
-  }  
+  }
 
   return (
     <Container maxW="lg" py={{ base: '12', md: '24' }} px={{ base: '4', sm: '8' }} backgroundColor='purple.50'>
@@ -106,13 +106,13 @@ export default function Cabinet() {
           <Heading size={{ base: 'sm', md: 'md' }}>
             Your current treatment
           </Heading>
-          <Box 
-          py={{ base: '4', sm: '8' }}
-          px={{ base: '4', sm: '10' }}
-          bg={{ base: 'bg-surface', sm: 'bg-surface' }}
-          boxShadow={{ base: 'md', sm: 'md' }}
-          borderRadius={{ base: 'md', sm: 'xl' }}
-          backgroundColor='purple.100'
+          <Box
+            py={{ base: '4', sm: '8' }}
+            px={{ base: '4', sm: '10' }}
+            bg={{ base: 'bg-surface', sm: 'bg-surface' }}
+            boxShadow={{ base: 'md', sm: 'md' }}
+            borderRadius={{ base: 'md', sm: 'xl' }}
+            backgroundColor='purple.100'
           >
             <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
               {currentMed && currentMed.map((docSnap) =>
@@ -133,13 +133,13 @@ export default function Cabinet() {
           <Heading size={{ base: 'sm', md: 'md' }}>
             Your future treatment
           </Heading>
-          <Box 
-          py={{ base: '4', sm: '8' }}
-          px={{ base: '4', sm: '10' }}
-          bg={{ base: 'bg-surface', sm: 'bg-surface' }}
-          boxShadow={{ base: 'md', sm: 'md' }}
-          borderRadius={{ base: 'md', sm: 'xl' }}
-          backgroundColor='purple.100'
+          <Box
+            py={{ base: '4', sm: '8' }}
+            px={{ base: '4', sm: '10' }}
+            bg={{ base: 'bg-surface', sm: 'bg-surface' }}
+            boxShadow={{ base: 'md', sm: 'md' }}
+            borderRadius={{ base: 'md', sm: 'xl' }}
+            backgroundColor='purple.100'
           >
             <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
               {futureMed && futureMed.map((docSnap) =>
@@ -160,13 +160,13 @@ export default function Cabinet() {
           <Heading size={{ base: 'sm', md: 'md' }}>
             Your past treatment
           </Heading>
-          <Box 
-          py={{ base: '4', sm: '8' }}
-          px={{ base: '4', sm: '10' }}
-          bg={{ base: 'bg-surface', sm: 'bg-surface' }}
-          boxShadow={{ base: 'md', sm: 'md' }}
-          borderRadius={{ base: 'md', sm: 'xl' }}
-          backgroundColor='purple.100'
+          <Box
+            py={{ base: '4', sm: '8' }}
+            px={{ base: '4', sm: '10' }}
+            bg={{ base: 'bg-surface', sm: 'bg-surface' }}
+            boxShadow={{ base: 'md', sm: 'md' }}
+            borderRadius={{ base: 'md', sm: 'xl' }}
+            backgroundColor='purple.100'
           >
             <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
               {pastMed && pastMed.map((docSnap) =>
@@ -179,17 +179,26 @@ export default function Cabinet() {
                   </Heading>
                   <Text>Quantity: {docSnap.quantityPerTake}</Text>
                   <Text>Frequency: {docSnap.frequencyPerDay}</Text>
-                  <Text>Time of treatment: {docSnap.timeTreatmentStart} - {docSnap.timeTreatmentEnd}</Text>
+                  <Text>Time of treatment: {docSnap.timeTreatmentStart.substr(0, 10)} - {docSnap.timeTreatmentEnd.substr(0, 10)}</Text>
                 </Box>
               )}
             </VStack>
           </Box>
         </Stack>
-        <Button colorScheme='blue'>
-            <Link href="/home">
-              Home
-            </Link>
-          </Button>
+        <Stack spacing="6">
+          <HStack spacing="10" justify="center">
+            <Button colorScheme="blue" size="sm">
+              <Link href="/home">
+                Home
+              </Link>
+            </Button>
+            <Button colorScheme="blue" size="sm">
+              <Link href="/home/calendar">
+                My tracker
+              </Link>
+            </Button>
+          </HStack>
+        </Stack>
       </Stack>
     </Container>
   )

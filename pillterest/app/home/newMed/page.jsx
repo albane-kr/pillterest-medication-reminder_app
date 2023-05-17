@@ -27,7 +27,7 @@ export default function NewMed() {
       setMedNameOption([])
       return
     }
-    
+
     //get data from documents of the collection "Medications" 
     //and push them into an array to be able to map the different documents to display
     const collMedications = collection(db, "Medications")
@@ -43,8 +43,8 @@ export default function NewMed() {
 
   useEffect(() => {
     refreshData()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   const handleAddMed = async () => {
 
@@ -91,7 +91,7 @@ export default function NewMed() {
       freqPerDay,
       timeTreatmentStart,
       timeTreatmentEnd,
-      date:["1900-01-01"]
+      date: []
     }
 
     await createNotification(newNotif)
@@ -121,9 +121,9 @@ export default function NewMed() {
         <Stack direction='column'>
           <HStack spacing={4}>
             <Select borderColor='black' placeholder='Name of medication' value={medName} onChange={(e) => setMedName(e.target.value)}>
-            {medNameOption && medNameOption.map((docSnap) =>
-              <option key={docSnap.id} value={docSnap.medicationName}>{docSnap.medicationName}</option>
-            )}
+              {medNameOption && medNameOption.map((docSnap) =>
+                <option key={docSnap.id} value={docSnap.medicationName}>{docSnap.medicationName}</option>
+              )}
             </Select>
             <Button colorScheme='blue'>
               <Link href="/home/newMed/createMed/">
@@ -133,9 +133,9 @@ export default function NewMed() {
           </HStack>
           <Input borderColor='black' placeholder='Quantity per take' value={qtyPerTake} onChange={(e) => setQtyPerTake(e.target.value)} />
           <Input borderColor='black' placeholder='Frequency per day' value={freqPerDay} onChange={(e) => setFreqPerDay(e.target.value)} />
-          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment starts' value={timeTreatmentStart} onChange={(e) => setTimeTreatmentStart(e.target.value)} />
-          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment ends' value={timeTreatmentEnd} onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
-          <Button colorScheme='blue' onClick={() => {handleAddMed(), handleCreateNotif()}} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeTreatmentStart.length < 1 || timeTreatmentEnd.length < 1 || timeTreatmentStart > timeTreatmentEnd}>
+          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment starts' value={timeTreatmentStart.substring(0,10)} onChange={(e) => setTimeTreatmentStart(e.target.value)} />
+          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment ends' value={timeTreatmentEnd.substring(0,10)} onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
+          <Button colorScheme='blue' onClick={() => { handleAddMed(), handleCreateNotif() }} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeTreatmentStart.length < 1 || timeTreatmentEnd.length < 1 || timeTreatmentStart > timeTreatmentEnd}>
             Add
           </Button>
           <Button colorScheme='blue'>

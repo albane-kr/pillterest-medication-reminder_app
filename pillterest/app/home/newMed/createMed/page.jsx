@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Container, Heading, Box, Input, Button, Stack, Select, } from "@chakra-ui/react";
+import { Container, Heading, Box, Input, Button, Stack, Select, useToast } from "@chakra-ui/react";
 import { createMed, toggleDrugAdminType } from '@/backend/firebase/firestore/db'
 
 
@@ -13,11 +13,12 @@ export default function CreateMed() {
   
   const handleCreateMed = async () => {
   
-    const createNewMed = { medName, drugAdminType, qtyPackage }
+    const createNewMed = { medName, drugAdminType }
 
     await createMed(createNewMed)
     setMedName("")
     setDrugAdminTime("")
+    toast({ title: "Medication created successfully", status: "success" })
   }
 
   return (
@@ -38,7 +39,7 @@ export default function CreateMed() {
           <Select borderColor='black' placeholder='Drug Administration Type' value={drugAdminType} onChange={(e) => setDrugAdminTime(e.target.value)}>
             <option value={"pills"}>pills</option>
           </Select>
-          <Button colorScheme='blue' onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1 || qtyPackage.length < 1}>
+          <Button colorScheme='blue' onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1}>
             Create        
           </Button>
           <Button colorScheme='blue'>

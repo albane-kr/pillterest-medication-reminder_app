@@ -80,7 +80,8 @@ const toggleMedName = async ({ docId, medicationName }) => {
 const deleteMed = async (docId) => {
     try {
         const addMedRef = doc(db, "Prescribed_Med", docId)
-        await deleteDoc(addMedRef)
+        const notifRef = doc(db, 'Notifications', docId)
+        await deleteDoc(addMedRef, notifRef)
     } catch (e) {
         console.log(e)
     }
@@ -132,7 +133,7 @@ const updateNotification = async (docId, date) => {
 const deleteDate = async (docId, dateToday) => {
     try {
         const notifRef = doc(db, "Notifications", docId)
-        await updateDoc(notifRef,{
+        await updateDoc(notifRef, {
             date: arrayRemove(dateToday)
         })
     } catch (e) {
@@ -141,4 +142,4 @@ const deleteDate = async (docId, dateToday) => {
 }
 
 
-export { createMed, toggleDrugAdminType, addMed, toggleMedName, deleteMed, createNotification, updateNotification, deleteDate} 
+export { createMed, toggleDrugAdminType, addMed, toggleMedName, deleteMed, createNotification, updateNotification, deleteDate } 

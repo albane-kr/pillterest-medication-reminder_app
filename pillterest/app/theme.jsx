@@ -10,6 +10,7 @@ const customedTheme = extendTheme({
     lg: "960px",
     xl: "1200px",
   },
+  backgroundColor:'purple.50'
 });
 
 const theme = extendTheme({ customedTheme });
