@@ -10,56 +10,52 @@ import { auth } from '@/backend/firebase/firebaseConfig'
 import { db } from "@/backend/firebase/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FaSignOutAlt } from 'react-icons/fa'
-import { historyNotif, updateNotification } from '@/backend/firebase/firestore/db'
+import { deleteDate, historyNotif, updateNotification } from '@/backend/firebase/firestore/db'
 
 //converts number to string 
 //then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
 export function pad2Digits(n) {
-    return n.toString().padStart(2, '0');
-  }
-  //date in format yyyy-mm-dd
+  return n.toString().padStart(2, '0');
+}
+//date in format yyyy-mm-dd
 export function formatDate(date) {
-    return [
-      date.getFullYear(),
-      pad2Digits(date.getMonth() + 1),
-      pad2Digits(date.getDate()),
-    ].join('-');
-  }
+  return [
+    date.getFullYear(),
+    pad2Digits(date.getMonth() + 1),
+    pad2Digits(date.getDate()),
+  ].join('-');
+}
+//date of the next day in format yyyy-mm-dd
+export function formatNextDate(date) {
+  return [
+    date.getFullYear(),
+    pad2Digits(date.getMonth() + 1),
+    pad2Digits(date.getDate() + 1),
+  ].join('-');
+}
 
 export default function Home() {
   const { user } = useAuthContext()
   const router = useRouter()
   const toast = useToast();
 
-  const [notificationChecked, setNotificationChecked] = useState([])
-  const [notificationUnchecked, setNotificationUnchecked] = useState([])
+
+  const [notificationToCheck, setNotificationToCheck] = useState([])
 
   const logout = () => {
     auth.signOut()
   }
 
-  /*
-  //converts number to string 
-  //then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
-  function pad2Digits(n) {
-    return n.toString().padStart(2, '0');
-  }
-  //date in format yyyy-mm-dd
-  function formatDate(date) {
-    return [
-      date.getFullYear(),
-      pad2Digits(date.getMonth() + 1),
-      pad2Digits(date.getDate()),
-    ].join('-');
-  }*/
   const dateToday = formatDate(new Date());
-  console.log(dateToday)
+  console.log("date of today: ",dateToday)
+  const dateTomorrow = formatNextDate(new Date())
+
 
   function notificationCondition(notif) {
-    return(
-      !notif.date.includes(dateToday)
-    && notif.timeTreatmentStart.substr(0,10) <= dateToday 
-    && notif.timeTreatmentEnd.substr(0,10) >= dateToday)
+    return (
+      !notif.date.includes(dateTomorrow)
+      && notif.timeTreatmentStart.substr(0, 10) <= dateToday
+      && notif.timeTreatmentEnd.substr(0, 10) >= dateToday)
   }
 
   const refreshData = async () => {
@@ -71,26 +67,35 @@ export default function Home() {
     //get unchecked notifications of the day
     const collNotifications = collection(db, "Notifications")
     const querySnapshotUncheckedNotif = await getDocs(query(collNotifications, where("uid", "==", user.uid)))
-    let arrayUncheckedNotif = []
-    querySnapshotUncheckedNotif.forEach((docSnapUncheckedNotif) => {
-      if ( notificationCondition(docSnapUncheckedNotif.data())){
-      arrayUncheckedNotif.push({ id: docSnapUncheckedNotif.id, ...docSnapUncheckedNotif.data() })
-      console.log("uncheckedNotif: ", { id: docSnapUncheckedNotif.id, ...docSnapUncheckedNotif.data() })
-      setNotificationUnchecked(arrayUncheckedNotif)
+    let arrayNotifToCheck = []
+    querySnapshotUncheckedNotif.forEach((docSnapNotifToCheck) => {
+      if (notificationCondition(docSnapNotifToCheck.data())) {
+        arrayNotifToCheck.push({ id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
+        console.log("uncheckedNotif: ", { id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
+        setNotificationToCheck(arrayNotifToCheck)
       }
-      //console.log(docSnapUncheckedNotif.data().timeTreatmentStart)
+      //console.log(docSnapNotifToCheck.data().timeTreatmentStart)
     })
   }
 
-  const handleUpdateNotif = async (doc, medName) => {
-    const dataToUpdate = {
-      date: [...doc.date, dateToday]
-    }
+  const handleUpdateNotif = async (doc) => {
+    if (!doc.date.includes(dateToday)) {
+      const dataToUpdate = {
+        date: [...doc.date, dateToday]
+      }
     updateNotification(doc.id, dataToUpdate)
     toast({
       title: "Date added with success",
       status: "success"
     })
+  } else {
+    deleteDate(doc.id, dateToday)
+    toast({
+      title: "Date deleted with success",
+      status: "success"
+    })
+  }
+
 
     //to update database
     refreshData()
@@ -133,29 +138,29 @@ export default function Home() {
         >
           <Heading size={{ base: 'sm', md: 'md' }}>Upcoming Medication</Heading>
           <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
-            {notificationUnchecked && notificationUnchecked.map((docSnapUncheckedNotif) =>
-              //{if(docSnapUncheckedNotif.timeTreatmentStart.substr(0, 10) <= dateToday && docSnapUncheckedNotif.timeTreatmentEnd.substr(0, 10) >= dateToday) {
-              <Box key={docSnapUncheckedNotif.id} h='50px'>
-                <Heading size='xs'>{docSnapUncheckedNotif.medicationName}</Heading>
+            {notificationToCheck && notificationToCheck.map((docSnapNotifToCheck) =>
+              //{if(docSnapNotifToCheck.timeTreatmentStart.substr(0, 10) <= dateToday && docSnapNotifToCheck.timeTreatmentEnd.substr(0, 10) >= dateToday) {
+              <Box key={docSnapNotifToCheck.id} h='50px'>
+                <Heading size='xs'>{docSnapNotifToCheck.medicationName}</Heading>
                 <InputGroup>
                   <InputRightElement>
                     <Checkbox
                       checked
-                      isDisabled={docSnapUncheckedNotif.date.includes(dateToday)}
+                      isDisabled={docSnapNotifToCheck.date.includes(dateTomorrow)}
                       onChange={() => {
-                        if (notificationCondition(docSnapUncheckedNotif)) {
-                          handleUpdateNotif(docSnapUncheckedNotif, docSnapUncheckedNotif.medicationName)
+                        if (notificationCondition(docSnapNotifToCheck)) {
+                          handleUpdateNotif(docSnapNotifToCheck)
                           refreshData()
                         } else {
-                          toast({title:"conditions don't match", status:"error"})
+                          toast({ title: "conditions don't match", status: "error" })
                         }
                       }}
                       borderColor='black'
                     ></Checkbox>
                   </InputRightElement>
                 </InputGroup>
-                <Text size='xs'>I took {docSnapUncheckedNotif.quantityPerTake} times per take</Text>
-                <Text size='xs'>I took {docSnapUncheckedNotif.frequencyPerDay} times the medication today</Text>
+                <Text size='xs'>I took {docSnapNotifToCheck.quantityPerTake} times per take</Text>
+                <Text size='xs'>I took {docSnapNotifToCheck.frequencyPerDay} times the medication today</Text>
               </Box>
               //}}
             )}

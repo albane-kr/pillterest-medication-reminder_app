@@ -1,5 +1,5 @@
 import { db } from "../firebaseConfig";
-import { collection, addDoc, updateDoc, doc, deleteDoc, setDoc } from 'firebase/firestore'
+import { collection, addDoc, updateDoc, doc, deleteDoc, setDoc, arrayRemove } from 'firebase/firestore'
 
 
 //create new medication (is public to all users)
@@ -118,6 +118,7 @@ const createNotification = async ({
     }
 }
 
+//adds day when notification is checked
 const updateNotification = async (docId, date) => {
     try {
         const notifRef = doc(db, "Notifications", docId)
@@ -127,6 +128,17 @@ const updateNotification = async (docId, date) => {
     }
 }
 
+//deletes day when notification is checked by error
+const deleteDate = async (docId, dateToday) => {
+    try {
+        const notifRef = doc(db, "Notifications", docId)
+        await updateDoc(notifRef,{
+            date: arrayRemove(dateToday)
+        })
+    } catch (e) {
+        console.log(e)
+    }
+}
 
 
-export { createMed, toggleDrugAdminType, addMed, toggleMedName, deleteMed, createNotification, updateNotification} 
+export { createMed, toggleDrugAdminType, addMed, toggleMedName, deleteMed, createNotification, updateNotification, deleteDate} 
