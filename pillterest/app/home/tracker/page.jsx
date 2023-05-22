@@ -7,7 +7,6 @@ import { db } from "@/backend/firebase/firebaseConfig";
 import { collection, query, getDocs, where } from "firebase/firestore";
 import { useAuth } from '@/backend/context/authContext'
 
-import '@/app/medTracker.css'
 
 
 export default function Tracker() {
