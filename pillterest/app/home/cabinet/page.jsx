@@ -193,7 +193,7 @@ export default function Cabinet() {
               </Link>
             </Button>
             <Button colorScheme="blue" size="sm">
-              <Link href="/home/calendar">
+              <Link href="/home/tracker">
                 My tracker
               </Link>
             </Button>
