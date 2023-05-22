@@ -61,7 +61,7 @@ export default function Tracker() {
             backgroundColor='purple.100'>
             <Text>{docSnapNotif.medicationName}</Text>
             <Text> Days when medication was taken:</Text>
-            <Text>{docSnapNotif.date}</Text>
+            <Text>{docSnapNotif.date.join(', ')}</Text>
           </Box>
         )}
         <Button colorScheme="blue" size="sm">
