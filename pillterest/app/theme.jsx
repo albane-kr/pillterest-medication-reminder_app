@@ -15,4 +15,4 @@ const customedTheme = extendTheme({
 
 const theme = extendTheme({ customedTheme });
 
-export default customedTheme;
+export default theme;

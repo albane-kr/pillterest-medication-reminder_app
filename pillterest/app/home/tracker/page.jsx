@@ -12,33 +12,26 @@ import { useAuth } from '@/backend/context/authContext'
 export default function Tracker() {
 
   const { user } = useAuth()
-  const [dates, setDates] = useState(new Date())
-  const [isAllChecked, setAllChecked] = useState(false)
-  const [isMissing, setMissing] = useState(false)
   const [notif, setNotif] = useState([])
 
-  function classNames(...args) {
-    return args.filter(Boolean).join(' ')
-  }
-
-
-
+  /**
+   * @returns up-to-date data from the database
+   */
   const refreshData = async () => {
     if (!user) {
-      setAllChecked(false)
-      setMissing(false)
       setNotif([])
       return
     }
 
+    //get notifications of the day from the database
     const collNotifications = collection(db, "Notifications")
+    //select from collection the notifications related to logged-in user
     const querySnapshotUncheckedNotif = await getDocs(query(collNotifications, where("uid", "==", user.uid)))
     let arrayNotif = []
+    //push them into an array to be able to map the different notification to display
     querySnapshotUncheckedNotif.forEach((docSnapNotif) => {
       arrayNotif.push({ id: docSnapNotif.id, ...docSnapNotif.data() })
-      console.log({ id: docSnapNotif.id, ...docSnapNotif.data() })
       setNotif(arrayNotif)
-      //console.log(docSnapNotifToCheck.data().timeTreatmentStart)
     })
   }
 

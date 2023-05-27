@@ -1,7 +1,7 @@
 'use client'
 
 import { CacheProvider } from '@chakra-ui/next-js'
-import { ChakraProvider, ThemeProvider, theme, ColorModeProvider, CSSReset } from '@chakra-ui/react'
+import { ChakraProvider, ThemeProvider, theme, CSSReset } from '@chakra-ui/react'
 
 export function Providers({ 
     children 
@@ -10,10 +10,8 @@ export function Providers({
     <CacheProvider>
         <ChakraProvider>
           <ThemeProvider theme={theme}>
-            <ColorModeProvider>
-              <CSSReset/>
+            <CSSReset/>
               {children}
-            </ColorModeProvider>
           </ThemeProvider> 
         </ChakraProvider>
     </CacheProvider>

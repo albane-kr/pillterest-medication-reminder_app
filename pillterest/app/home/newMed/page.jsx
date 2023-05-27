@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
 import { Container, Heading, Box, Input, Button, Stack, Select, HStack, useToast } from "@chakra-ui/react";
 import { addMed, createNotification, toggleMedName } from '@/backend/firebase/firestore/db'
@@ -22,13 +21,17 @@ export default function NewMed() {
   const [timeTreatmentStart, setTimeTreatmentStart] = useState("")
   const [timeTreatmentEnd, setTimeTreatmentEnd] = useState("")
 
+
+  /**
+   * @returns up-to-date data from the database
+   */
   const refreshData = async () => {
     if (!user) {
       setMedNameOption([])
       return
     }
 
-    //get data from documents of the collection "Medications" 
+    //get data from documents of the collection "Medications" from the database
     //and push them into an array to be able to map the different documents to display
     const collMedications = collection(db, "Medications")
     const qMed = query(collMedications)
@@ -36,7 +39,6 @@ export default function NewMed() {
     let array = []
     querySnapshot.forEach((docSnap) => {
       array.push({ id: docSnap.id, ...docSnap.data() })
-      console.log(docSnap.id, " => ", docSnap.data());
       setMedNameOption(array)
     });
   }
@@ -46,8 +48,13 @@ export default function NewMed() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
+  /**
+   * apply functions from database to add new medications to take 
+   * new medication is associated to logged-in user
+   */
   const handleAddMed = async () => {
 
+    //check if user is logged-in
     if (!isLoggedIn) {
       toast({
         title: "You must be logged in to add a prescribed medication",
@@ -55,7 +62,6 @@ export default function NewMed() {
         duration: 9000,
         isClosable: true,
       })
-      return;
     }
 
     const addNewMed = {
@@ -83,7 +89,12 @@ export default function NewMed() {
     refreshData()
   }
 
+   /**
+   * apply functions from database to create notification of the newly added medication
+   * notification is associated to logged-in user
+   */
   const handleCreateNotif = async () => {
+
     const newNotif = {
       medName,
       uid: user.uid,
@@ -120,7 +131,10 @@ export default function NewMed() {
       >
         <Stack direction='column'>
           <HStack spacing={4}>
-            <Select borderColor='black' placeholder='Name of medication' value={medName} onChange={(e) => setMedName(e.target.value)}>
+            <Select borderColor='black' 
+            placeholder='Name of medication' 
+            value={medName} 
+            onChange={(e) => setMedName(e.target.value)}>
               {medNameOption && medNameOption.map((docSnap) =>
                 <option key={docSnap.id} value={docSnap.medicationName}>{docSnap.medicationName}</option>
               )}
@@ -131,11 +145,32 @@ export default function NewMed() {
               </Link>
             </Button>
           </HStack>
-          <Input borderColor='black' placeholder='Quantity per take' value={qtyPerTake} onChange={(e) => setQtyPerTake(e.target.value)} />
-          <Input borderColor='black' placeholder='Frequency per day' value={freqPerDay} onChange={(e) => setFreqPerDay(e.target.value)} />
-          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment starts' value={timeTreatmentStart.substring(0,10)} onChange={(e) => setTimeTreatmentStart(e.target.value)} />
-          <Input type="datetime-local" borderColor='black' placeholder='Day the treatment ends' value={timeTreatmentEnd.substring(0,10)} onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
-          <Button colorScheme='blue' onClick={() => { handleAddMed(), handleCreateNotif() }} disabled={freqPerDay.length < 1 || toggleMedName.length < 1 || qtyPerTake.length < 1 || timeTreatmentStart.length < 1 || timeTreatmentEnd.length < 1 || timeTreatmentStart > timeTreatmentEnd}>
+          <Input borderColor='black' 
+            placeholder='Quantity per take' 
+            value={qtyPerTake} 
+            onChange={(e) => setQtyPerTake(e.target.value)} />
+          <Input borderColor='black' 
+            placeholder='Frequency per day' 
+            value={freqPerDay} 
+            onChange={(e) => setFreqPerDay(e.target.value)} />
+          <Input type="date" 
+            borderColor='black' 
+            placeholder='Day the treatment starts' 
+            value={timeTreatmentStart} 
+            onChange={(e) => setTimeTreatmentStart(e.target.value)} />
+          <Input type="date" 
+            borderColor='black' 
+            placeholder='Day the treatment ends' 
+            value={timeTreatmentEnd} 
+            onChange={(e) => setTimeTreatmentEnd(e.target.value)} />
+          <Button colorScheme='blue' 
+            onClick={() => { handleAddMed(), handleCreateNotif() }} 
+            disabled={freqPerDay.length < 1 
+              && toggleMedName.length < 1 
+              && qtyPerTake.length < 1 
+              && timeTreatmentStart.length < 1 
+              && timeTreatmentEnd.length < 1 
+              && timeTreatmentStart > timeTreatmentEnd}>
             Add
           </Button>
           <Button colorScheme='blue'>

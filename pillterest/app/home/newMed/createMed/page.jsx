@@ -9,15 +9,19 @@ import { createMed, toggleDrugAdminType } from '@/backend/firebase/firestore/db'
 export default function CreateMed() {
 
   const [medName, setMedName] = useState("")
-  const [drugAdminType, setDrugAdminTime] = useState("")
+  const [drugAdminType, setDrugAdminType] = useState("")
+  const toast = useToast()
   
+  /**
+   * apply backend function to create new medication
+   */
   const handleCreateMed = async () => {
   
     const createNewMed = { medName, drugAdminType }
 
     await createMed(createNewMed)
     setMedName("")
-    setDrugAdminTime("")
+    setDrugAdminType("")
     toast({ title: "Medication created successfully", status: "success" })
   }
 
@@ -35,11 +39,22 @@ export default function CreateMed() {
         backgroundColor='purple.100'
       >
         <Stack direction='column'>
-          <Input borderColor='black' placeholder='Name of the medication' value={medName} onChange={(e) => setMedName(e.target.value)} />
-          <Select borderColor='black' placeholder='Drug Administration Type' value={drugAdminType} onChange={(e) => setDrugAdminTime(e.target.value)}>
-            <option value={"pills"}>pills</option>
+          <Input borderColor='black' 
+            placeholder='Name of the medication' 
+            value={medName} 
+            onChange={(e) => setMedName(e.target.value)} />
+          <Select borderColor='black' 
+            placeholder='Drug Administration Type' 
+            value={drugAdminType} 
+            onChange={(e) => setDrugAdminType(e.target.value)}>
+              <option value={"pills"}>pills</option>
+              <option value={"tsp"}>tsp</option>
+              <option value={"tbsp"}>tbsp (1tbsp = 3tsp)</option>
+              <option value={"capsule"}>capsule</option>
+              <option value={"phial"}>phial</option>
           </Select>
-          <Button colorScheme='blue' onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1}>
+          <Button colorScheme='blue' 
+          onClick={() => handleCreateMed()} disabled={medName.length < 1 || toggleDrugAdminType.length < 1}>
             Create        
           </Button>
           <Button colorScheme='blue'>

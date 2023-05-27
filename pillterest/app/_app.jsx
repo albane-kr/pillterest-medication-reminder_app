@@ -4,8 +4,8 @@ import { AuthUserProvider } from '/backend/context/authContext'
 
 
 export default function App({ Component, pageProps}) {
+    //make sure Firebase app is always initialized in all pages
     initFirebase();
-
 
     return (
         <ChakraProvider>

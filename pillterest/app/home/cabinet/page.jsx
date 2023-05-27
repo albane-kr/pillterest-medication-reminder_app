@@ -21,6 +21,13 @@ export default function Cabinet() {
 
   const dateToday = formatDate(new Date());
 
+  /**
+   * Check status of the treatment: ongoing treatment
+   * @param med to check
+   * @returns boolean:
+   *    true if it is a current medication to take and treatment period is still ongoing
+   *    false otherwise
+   */
   function isCurrentMed(med) {
     return (
       med.timeTreatmentStart <= dateToday
@@ -28,18 +35,29 @@ export default function Cabinet() {
     )
   }
 
+  /**
+   * Check status of the treatment: future treatment
+   * @param med to check
+   * @returns boolean:
+   *    true if it is a future medication to take and treatment period has not started yet
+   */
   function isFutureMed(med) {
     return (
       med.timeTreatmentStart >= dateToday
     )
   }
 
-  function isPastMed(med) {
-    return (
-      med.timeTreatmentEnd <= dateToday
-    )
-  }
+  /**
+   * Disclaimer:
+   * as current and future treatment are checked, 
+   * there is no need to check past treatment 
+   * as they are all those who do not meet the previous conditions
+   */
 
+
+  /**
+   * @returns up-to-date data from the database
+   */
   const refreshData = async () => {
     if (!user) {
       setCurrentMed([])
@@ -49,33 +67,26 @@ export default function Cabinet() {
       return
     }
 
-    //get data from documents of the collection "Prescribed_Med" 
-    //and push them into an array to be able to map the different documents to display
+    //get data from documents of the collection "Prescribed_Med" from database
     const collPrescribedMed = collection(db, "Prescribed_Med")
     const querySnapshot = await getDocs(query(collPrescribedMed, where("uid", "==", user.uid)));
-    console.log(user.uid)
-    console.log(querySnapshot)
     let arrayCurrentMed = []
     let arrayFutureMed = []
     let arrayPastMed = []
     querySnapshot.forEach((docSnap) => {
+      //push each medication depending on its treatment period
       if (isCurrentMed(docSnap.data())) {
         arrayCurrentMed.push({ id: docSnap.id, ...docSnap.data() })
-        //console.log(docSnap.id, " => ", docSnap.data());
-        //console.log(querySnapshot.size)
-        setCurrentMed(arrayCurrentMed)
       } else if (isFutureMed(docSnap.data())) {
         arrayFutureMed.push({ id: docSnap.id, ...docSnap.data() })
-        //console.log(docSnap.id, " => ", docSnap.data());
-        //console.log(querySnapshot.size)
-        setFutureMed(arrayFutureMed)
       } else {
         arrayPastMed.push({ id: docSnap.id, ...docSnap.data() })
-        //console.log(docSnap.id, " => ", docSnap.data());
-        //console.log(querySnapshot.size)
-        setPastMed(arrayPastMed)
       }
+      
     });
+    setCurrentMed(arrayCurrentMed)
+    setFutureMed(arrayFutureMed)
+    setPastMed(arrayPastMed)
   }
 
   useEffect(() => {
@@ -83,13 +94,16 @@ export default function Cabinet() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
-
+  /**
+   * apply backend function to delete medication
+   * @param id of the document to delete in the database
+   */
   const handleMedDelete = async (id) => {
+    //JS confirm pop-up to check user's intend as deleting is irreversible
     if (confirm("Are you sure you want to delete this medication ?")) {
-      deleteMed(id)
+      await deleteMed(id)
       toast({ title: "Prescribed medication deleted successfully", status: "success" })
     }
-
     //to update database
     refreshData()
   }

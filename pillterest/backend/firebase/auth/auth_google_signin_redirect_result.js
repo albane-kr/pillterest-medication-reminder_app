@@ -1,5 +1,6 @@
 import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 
+
 export default async function signInWithRedirectGoogle() {
   const auth = getAuth();
   const googleProvider = new GoogleAuthProvider()
@@ -10,9 +11,9 @@ export default async function signInWithRedirectGoogle() {
 
   const result = await getRedirectResult(auth);
   if (result) {
-    // This is the signed-in user
+    //signed-in user
     const user = result.user;
-    // This gives you a Google Access Token.
+    //Google Access Token.
     const credential = googleProvider.credentialFromResult(auth, result);
     const token = credential.accessToken;
   }
@@ -25,6 +26,7 @@ export default async function signInWithRedirectGoogle() {
 
   const user = auth.currentUser;
 
+  //display information of logged-in user
   if (user !== null) {
     user.providerData.forEach((profile) => {
       console.log("Sign-in provider: " + profile.providerId);

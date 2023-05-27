@@ -2,7 +2,9 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Box, Button, Checkbox, InputGroup, InputRightElement, Container, Heading, VStack, StackDivider, HStack, Stack, Text, Image, Icon, useToast } from '@chakra-ui/react'
+import { Box, Button, Checkbox, InputGroup, InputRightElement, 
+  Container, Heading, VStack, StackDivider, HStack, Stack, 
+  Text, Image, Icon, useToast } from '@chakra-ui/react'
 import { useAuthContext } from '@/backend/context/authContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -10,14 +12,24 @@ import { auth } from '@/backend/firebase/firebaseConfig'
 import { db } from "@/backend/firebase/firebaseConfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FaSignOutAlt } from 'react-icons/fa'
-import { deleteDate, historyNotif, updateNotification } from '@/backend/firebase/firestore/db'
+import { deleteDate, updateNotification } from '@/backend/firebase/firestore/db'
 
-//converts number to string 
-//then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
+
+/**
+ * converts number to string 
+ * then pads it in a 2 digits string by adding 0 in front of the number if it is only 1 digit long
+ * @param n number to be converted and padded in 2 digits string
+ * @returns converted and padded number n
+ */
 export function pad2Digits(n) {
   return n.toString().padStart(2, '0');
 }
-//date in format yyyy-mm-dd
+
+/**
+ * format current date to yyyy-mm-dd
+ * @param date to be formatted
+ * @returns formatted date
+ */
 export function formatDate(date) {
   return [
     date.getFullYear(),
@@ -25,7 +37,11 @@ export function formatDate(date) {
     pad2Digits(date.getDate()),
   ].join('-');
 }
-//date of the next day in format yyyy-mm-dd
+/**
+ * format date of the following day to yyyy-mm-dd
+ * @param date to be formatted
+ * @returns formatted date
+ */
 export function formatNextDate(date) {
   return [
     date.getFullYear(),
@@ -35,6 +51,7 @@ export function formatNextDate(date) {
 }
 
 export default function Home() {
+
   const { user } = useAuthContext()
   const router = useRouter()
   const toast = useToast();
@@ -50,45 +67,68 @@ export default function Home() {
   console.log("date of today: ", dateToday)
   const dateTomorrow = formatNextDate(new Date())
 
-
+  /**
+   * Conditions to display the notification
+   * 
+   * @param notif data of a notification from the Notification collection
+   * @returns boolean: 
+   *    true if the notification has not been checked at current date, and if the date is in the treatment period
+   *    false otherwise
+   */
   function notificationCondition(notif) {
     return (
       !notif.date.includes(dateTomorrow)
-      && notif.timeTreatmentStart.substr(0, 10) <= dateToday
-      && notif.timeTreatmentEnd.substr(0, 10) >= dateToday)
+      && notif.timeTreatmentStart <= dateToday
+      && notif.timeTreatmentEnd >= dateToday)
   }
 
+  /**
+   * @returns up-to-date data from the database
+   */
   const refreshData = async () => {
     if (!user) {
       setNotification([])
       return
     }
 
-    //get unchecked notifications of the day
+    //get notifications of the day from the database
+    //retreive collection containing notifications
     const collNotifications = collection(db, "Notifications")
+    //select from collection the notifications related to logged-in user
     const querySnapshotUncheckedNotif = await getDocs(query(collNotifications, where("uid", "==", user.uid)))
     let arrayNotifToCheck = []
+    //iterate through each selected notification
     querySnapshotUncheckedNotif.forEach((docSnapNotifToCheck) => {
+      //check if they meet the conditions
       if (notificationCondition(docSnapNotifToCheck.data())) {
+        //push notification id and data into array
         arrayNotifToCheck.push({ id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
-        console.log({ id: docSnapNotifToCheck.id, ...docSnapNotifToCheck.data() })
+        //update state of constant "notificationToCheck" by adding the array to it
         setNotificationToCheck(arrayNotifToCheck)
       }
-      //console.log(docSnapNotifToCheck.data().timeTreatmentStart)
     })
   }
 
+    /**
+     * apply backend functions on notification when user checks the notification
+     * can either add or delete current date based on conditions
+     * @param doc notification to update
+     */
   const handleUpdateNotif = async (doc) => {
+    //check if the date array of the notification already includes current date
     if (!doc.date.includes(dateToday)) {
+      //add current date to list of dates where notification was checked
       const dataToUpdate = {
         date: [...doc.date, dateToday]
       }
+      //update notification with current date
       updateNotification(doc.id, dataToUpdate)
       toast({
         title: "Date added with success",
         status: "success"
       })
     } else {
+      //if current date is already in the date array, current date is deleted
       deleteDate(doc.id, dateToday)
       toast({
         title: "Date deleted with success",
@@ -97,7 +137,7 @@ export default function Home() {
     }
 
 
-    //to update database
+    //update database
     refreshData()
   }
 
@@ -120,8 +160,8 @@ export default function Home() {
             </Button>
           </InputRightElement>
         </InputGroup>
-        <Stack spacing={{ base: '2', md: '3' }} textAlign="center">
-          <Image src="https://drive.google.com/file/d/1KW8MRDN78HmjmjhKgQ7nU83HailOYK9X/view?usp=sharing" alt="pillterest_logo" />
+        <Stack spacing={{ base: '2', md: '3' }}>
+          <Image src="/pillterest.svg" alt="pillterest_logo" content='center'/>
         </Stack>
       </VStack>
       <Stack spacing="8">
@@ -139,7 +179,6 @@ export default function Home() {
           <Heading size={{ base: 'sm', md: 'md' }}>Upcoming Medication</Heading>
           <VStack spacing={5} align='stretch' divider={<StackDivider borderColor='gray.500' />}>
             {notificationToCheck && notificationToCheck.map((docSnapNotifToCheck) =>
-              //{if(docSnapNotifToCheck.timeTreatmentStart.substr(0, 10) <= dateToday && docSnapNotifToCheck.timeTreatmentEnd.substr(0, 10) >= dateToday) {
               <Box key={docSnapNotifToCheck.id} h='50px'>
                 <Heading size='xs'>{docSnapNotifToCheck.medicationName}</Heading>
                 <InputGroup>
@@ -162,7 +201,6 @@ export default function Home() {
                 <Text size='xs'>I took {docSnapNotifToCheck.quantityPerTake} times per take</Text>
                 <Text size='xs'>I took {docSnapNotifToCheck.frequencyPerDay} times the medication today</Text>
               </Box>
-              //}}
             )}
           </VStack>
         </Box>
