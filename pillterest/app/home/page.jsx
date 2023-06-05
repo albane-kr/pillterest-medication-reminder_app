@@ -87,7 +87,7 @@ export default function Home() {
    */
   const refreshData = async () => {
     if (!user) {
-      setNotification([])
+      setNotificationToCheck([])
       return
     }
 

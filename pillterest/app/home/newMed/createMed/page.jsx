@@ -31,7 +31,7 @@ export default function CreateMed() {
         <Heading>Describe your new medication</Heading>
       </Stack>
       <Box
-        py={{ base: '0', sm: '8' }}
+        py={{ base: '4', sm: '8' }}
         px={{ base: '4', sm: '10' }}
         bg={{ base: 'transparent', sm: 'bg-surface' }}
         boxShadow={{ base: 'none', sm: 'md' }}

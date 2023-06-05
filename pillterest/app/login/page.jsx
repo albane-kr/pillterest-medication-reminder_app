@@ -1,7 +1,7 @@
 'use client'
 
 import { initFirebase } from '@/backend/firebase/firebaseConfig'
-import { Button, Container, Heading, Stack, Image } from '@chakra-ui/react'
+import { Button, Container, Stack, Image } from '@chakra-ui/react'
 import 'firebase/auth'
 import signInWithRedirectGoogle from '@/backend/firebase/auth/auth_google_signin_redirect_result'
 
